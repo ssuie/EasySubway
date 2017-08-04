@@ -1,64 +1,142 @@
-package com.example.soyeon.gateinfo;
+package kr.go.seoul.exitinfo;
 
-import android.graphics.Bitmap;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.SearchView;
 import android.view.View;
-import android.webkit.WebView;
-import android.webkit.WebViewClient;
 import android.widget.Button;
+import android.widget.EditText;
+import android.widget.TextView;
 
-import kr.go.seoul.trafficsubway.Common.WebViewInterfaceTypeB;
+import org.xmlpull.v1.XmlPullParser;
+import org.xmlpull.v1.XmlPullParserException;
+import org.xmlpull.v1.XmlPullParserFactory;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
 
 public class MainActivity extends AppCompatActivity {
 
-    private String openAPIKey = "50707a52796f396f3733786d595179";
-    private String subwayLocationAPIKey = "45425364766f396f373947755a6f41";
-    private WebView lineMapWebview;
-    private WebViewInterfaceTypeB mWebViewInterface;
-    Button btn_search;
-    SearchView search;
-    Bitmap resize;
+    private String key = "48435751656d696335367153677846";      //吏��븯泥� �떎�떆媛� �젙蹂� �젣�쇅�븯怨� �궗�슜媛��뒫
+    URL apiURL = null;
+
+    EditText edit;
+    Button btn;
+    TextView text;
 
 
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        /*
-        if (getIntent() != null && getIntent().getStringExtra("OpenAPIKey") != null)
-            openAPIKey = getIntent().getStringExtra("OpenAPIKey");
-        if (getIntent() != null && getIntent().getStringExtra("SubwayLocationAPIKey") != null)
-            subwayLocationAPIKey = getIntent().getStringExtra("SubwayLocationAPIKey");
+        edit = (EditText)findViewById(R.id.edit);
+        btn = (Button)findViewById(R.id.btn);
+        text = (TextView)findViewById(R.id.text);
 
-
-        subwayButtonTypeB.setOpenAPIKey(key);                           //지하철 기본 apikey(실시간 도착정보 조회가 가능한 키로 사용시 setsubwayLocationAPIKey 생략가능
-        subwayButtonTypeB.setsubwayLocationAPIKey(subwayKey);           //지하철 실시간 도착정보용 apikey(B타입과 Mini타입에서만 사용)
-        subwayTypeMini.setOpenAPIKey(key);
-        subwayTypeMini.setsubwayLocationAPIKey(subwayKey);
-*/
-        btn_search = (Button) findViewById(R.id.btn_search);
-        //search = (SearchView) findViewById(R.id.search);
-        btn_search.setOnClickListener(new View.OnClickListener() {
+        btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                btn_search.setVisibility(view.GONE);
-                //search.setVisibility(view.VISIBLE);
+                ProcessNetworkSubwayFirstLastTimeInfoThread thread = new ProcessNetworkSubwayFirstLastTimeInfoThread();
+                thread.execute(edit.getText().toString());
+
             }
         });
+    }
 
+    class ProcessNetworkSubwayFirstLastTimeInfoThread extends AsyncTask<String, Void, String> {
 
+        String subwayId = "";
+        String ectrcNo ="";
+        String subwayNm="";
+        String cfrBuild="";
 
-        lineMapWebview = (WebView) findViewById(R.id.line_map_webview);
-        lineMapWebview.setWebViewClient(new WebViewClient());
-        lineMapWebview.getSettings().setJavaScriptEnabled(true);
-        lineMapWebview.getSettings().setBuiltInZoomControls(true);
-        lineMapWebview.getSettings().setSupportZoom(true);
-        lineMapWebview.getSettings().setDisplayZoomControls(false);
-        lineMapWebview.getSettings().setDefaultTextEncodingName("UTF-8");
-        mWebViewInterface = new WebViewInterfaceTypeB(this, lineMapWebview, openAPIKey, subwayLocationAPIKey);
-        lineMapWebview.addJavascriptInterface(mWebViewInterface, "Android");
-        lineMapWebview.loadUrl("file:///android_asset/mSeoul_Subway.html");
+        public ProcessNetworkSubwayFirstLastTimeInfoThread() {
+        }
+
+        protected String doInBackground(String... strings) {
+            this.executeClient(strings);
+            return "";
+        }
+
+        protected void onPostExecute(String result) {
+            text.setText(cfrBuild);
+        }
+
+        void executeClient(String[] strings) {
+
+            InputStream in = null;
+            XmlPullParserFactory factory;
+            XmlPullParser xpp;
+
+            try
+            {
+                apiURL = new URL("http://swopenapi.seoul.go.kr/api/subway/" + key + "/xml/gateInfo/0/20/"+edit.getText().toString());
+                in = apiURL.openStream();
+                factory = XmlPullParserFactory.newInstance();
+                factory.setNamespaceAware(true);
+                xpp = factory.newPullParser();
+                xpp.setInput(in, "UTF-8");
+                int eventType1 = xpp.getEventType();
+                String tagName = "";
+                String updnLine = "";
+
+                for (boolean isItemTag = false; eventType1 != 1; eventType1 = xpp.next()) {
+                    if (eventType1 == 2) {
+                        tagName = xpp.getName();
+                        if (tagName.equals("row")) {
+                            isItemTag = true;
+                        }
+                    } else if (eventType1 == 4) {
+                        if (isItemTag && !tagName.equals("") && !xpp.getText().equals("")) {
+                            if (tagName.equals("subwayId")) {
+                                subwayId = xpp.getText();
+                            } else if (tagName.equals("subwayNm")) {
+                                cfrBuild += xpp.getText()+") : ";
+                            } else if (tagName.equals("ectrcNo")) {
+                                cfrBuild += xpp.getText()+"번 출구(";
+                            } else if(tagName.equals("cfrBuild")) {
+                                cfrBuild += xpp.getText() + "\n";
+                            } else if(tagName.equals("updnLine")) {
+                                updnLine = xpp.getText();
+                            }
+                        }
+                    } else if (eventType1 == 3) {
+                        tagName = xpp.getName();
+                        if (tagName.equals("row")) {
+                            isItemTag = false;
+                            if (subwayId.equals("1065")) {
+                                if (updnLine.equals("0")) {
+                                    updnLine = "1";
+                                } else {
+                                    updnLine = "0";
+                                }
+                            }
+                        } else {
+                            tagName = "";
+                        }
+                    }
+                }
+            } catch (MalformedURLException var22) {
+                var22.printStackTrace();
+            } catch (IOException var23) {
+                var23.printStackTrace();
+            } catch (XmlPullParserException var24) {
+                var24.printStackTrace();
+            } finally {
+                if (in != null) {
+                    try {
+                        in.close();
+                    } catch (IOException var21) {
+                        var21.printStackTrace();
+                    }
+                }
+
+            }
+
+        }
     }
 }
