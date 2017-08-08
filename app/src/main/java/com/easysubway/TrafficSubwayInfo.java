@@ -86,7 +86,7 @@ public class TrafficSubwayInfo extends BaseActivity
     private String arvlMsg2;
     private ArrayList<RealtimeStationArrivalInfo> realtimeStationArrivalInfoArrayList = new ArrayList();
     private String subwayId;
-    private String subwayNm;
+     static String subwayNm;
     private String lastcarDiv;
     private String updnLine;
     private String expressyn;
@@ -626,7 +626,7 @@ public class TrafficSubwayInfo extends BaseActivity
                             } else if (tagName.equals("subwayNm")) {
                                 cfrBuild += xpp.getText()+") : ";
                             } else if (tagName.equals("ectrcNo")) {
-                                cfrBuild += xpp.getText()+"踰� 異쒓뎄(";
+                                cfrBuild += xpp.getText()+"번 출구(";
                             } else if(tagName.equals("cfrBuild")) {
                                 cfrBuild += xpp.getText() + "\n";
                             } else if(tagName.equals("updnLine")) {

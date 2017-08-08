@@ -10,10 +10,10 @@ import android.webkit.WebView;
  */
 
 public class WebViewInterface {
-    private WebView mAppView;
-    private Activity mContext;
-    private String openAPIKey;
-    private String subwayLocationAPIKey;
+     WebView mAppView;
+     static Activity mContext;
+     static String openAPIKey;
+    static String subwayLocationAPIKey;
 
     public WebViewInterface(Activity activity, WebView view, String openAPIKey, String subwayLocationAPIKey) {
         this.mAppView = view;

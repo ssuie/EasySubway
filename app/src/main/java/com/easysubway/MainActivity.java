@@ -1,14 +1,22 @@
 package com.easysubway;
 
+import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import kr.go.seoul.trafficsubway.Common.BaseActivity;
 
 public class MainActivity extends BaseActivity {
+
+    static  final int GET_STRING = 1;
+    TextView text;
+    public static Context mContext;
 
     public MainActivity()
     {
@@ -20,11 +28,32 @@ public class MainActivity extends BaseActivity {
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        mContext = this;
+
+        Button button = (Button)findViewById(R.id.Search);
+
+        button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(MainActivity.this, SearchActivity.class);
+                startActivityForResult(intent, GET_STRING);
+            }
+        });
+
         if(getIntent() != null && getIntent().getStringExtra("OpenAPIKey") != null)
             openAPIKey = getIntent().getStringExtra("OpenAPIKey");
         if(getIntent() != null && getIntent().getStringExtra("SubwayLocationAPIKey") != null)
             subwayLocationAPIKey = getIntent().getStringExtra("SubwayLocationAPIKey");
         initView();
+    }
+
+    public void onActivityResult(int requestCode, int resultCode, Intent data){
+        if(requestCode == GET_STRING){
+            if(resultCode == RESULT_OK){
+                text.setText(data.getStringExtra("INPUT_TEXT"));
+            }
+        }
     }
 
     private void initView()
