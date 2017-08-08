@@ -6,7 +6,6 @@ import android.graphics.drawable.ColorDrawable;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
-import android.util.Log;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -38,8 +37,6 @@ import kr.go.seoul.trafficsubway.Common.FirstLastTimeInfo;
 import kr.go.seoul.trafficsubway.Common.FontUtils;
 import kr.go.seoul.trafficsubway.Common.RealtimeStationArrivalInfo;
 import kr.go.seoul.trafficsubway.Common.StationInfo;
-
-import static android.R.attr.key;
 
 /**
  * Created by eunhye Lee on 2017-08-08.
@@ -86,7 +83,7 @@ public class TrafficSubwayInfo extends BaseActivity
     private String arvlMsg2;
     private ArrayList<RealtimeStationArrivalInfo> realtimeStationArrivalInfoArrayList = new ArrayList();
     private String subwayId;
-     static String subwayNm;
+    private String subwayNm;
     private String lastcarDiv;
     private String updnLine;
     private String expressyn;
@@ -579,7 +576,7 @@ public class TrafficSubwayInfo extends BaseActivity
 
         String subwayId = "";
         String ectrcNo ="";
-        String cfrBuild;
+        String cfrBuild="";
 
 
         public ProcessNetworkSubwayExitInfoThread() {
@@ -602,8 +599,7 @@ public class TrafficSubwayInfo extends BaseActivity
 
             try
             {
-                Log.i("tag",stationNM);
-                apiURL = new URL("http://swopenapi.seoul.go.kr/api/subway/" + key + "/xml/gateInfo/0/20/"+TrafficSubwayInfo.this.subwayNm);
+                apiURL = new URL("http://swopenapi.seoul.go.kr/api/subway/" + TrafficSubwayInfo.this.openAPIKey + "/xml/gateInfo/0/20/"+strings[0]);
                 in = apiURL.openStream();
                 factory = XmlPullParserFactory.newInstance();
                 factory.setNamespaceAware(true);
@@ -626,7 +622,7 @@ public class TrafficSubwayInfo extends BaseActivity
                             } else if (tagName.equals("subwayNm")) {
                                 cfrBuild += xpp.getText()+") : ";
                             } else if (tagName.equals("ectrcNo")) {
-                                cfrBuild += xpp.getText()+"번 출구(";
+                                cfrBuild += "\n"+xpp.getText()+"번 출구(";
                             } else if(tagName.equals("cfrBuild")) {
                                 cfrBuild += xpp.getText() + "\n";
                             } else if(tagName.equals("updnLine")) {
