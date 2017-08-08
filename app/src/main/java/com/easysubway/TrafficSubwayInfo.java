@@ -622,7 +622,7 @@ public class TrafficSubwayInfo extends BaseActivity
                             } else if (tagName.equals("subwayNm")) {
                                 cfrBuild += xpp.getText()+") : ";
                             } else if (tagName.equals("ectrcNo")) {
-                                cfrBuild += xpp.getText()+"번 출구(";
+                                cfrBuild += "\n"+xpp.getText()+"번 출구(";
                             } else if(tagName.equals("cfrBuild")) {
                                 cfrBuild += xpp.getText() + "\n";
                             } else if(tagName.equals("updnLine")) {
