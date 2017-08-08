@@ -1,11 +1,10 @@
 package com.easysubway;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
 import android.view.View;
-import android.webkit.WebView;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
@@ -14,7 +13,7 @@ import android.widget.ListView;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-public class SearchActivity extends AppCompatActivity {
+public class SearchActivity extends Activity {
     public static MyMenu menu = new MyMenu();
     ArrayList<String> items = new ArrayList<>();
     ListViewAdapter     adapter = new ListViewAdapter();
