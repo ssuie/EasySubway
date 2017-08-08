@@ -13,7 +13,7 @@ public class MainActivity extends BaseActivity {
     public MainActivity()
     {
         openAPIKey = "70575677706d696333327152507752";
-        subwayLocationAPIKey = "48435751656d696335367153677846";
+        subwayLocationAPIKey = "70575677706d696333327152507752";
     }
 
     protected void onCreate(Bundle savedInstanceState)
